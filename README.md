@@ -54,10 +54,10 @@ https://ollama.com
 ```bash
 ollama pull llama3.2
 
-3️⃣ Install Dependencies
+## 3️⃣ Install Dependencies
 pip install flask requests
 
-4️⃣ Run the Project
+## 4️⃣ Run the Project
 
 Open two terminals.
 
@@ -65,7 +65,7 @@ Terminal 1
 ollama serve
 Terminal 2
 python app.py
-5️⃣ Open in Browser
+## 5️⃣ Open in Browser
 http://127.0.0.1:5000
 📂 Project Structure
 devinspect-ai/
@@ -80,7 +80,7 @@ devinspect-ai/
 └── static/
     ├── style.css
     └── script.js
-⚙️ Model Configuration
+## ⚙️ Model Configuration
 
 To change the AI model, edit:
 
@@ -107,6 +107,6 @@ Feel free to fork the project and submit pull requests.
 
 MIT License
 
-💻 About
+## 💻 About
 
 DevInspect AI was built as a smart AI-assisted code review project using Flask and Ollama to help developers review and improve code more efficiently
