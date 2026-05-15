@@ -61,21 +61,6 @@ python app.py
 ## 5️⃣ 🌐 Open in Browser
 http://127.0.0.1:5000
 
-
-## 📁 Project Structure
-devinspect-ai/
-│
-├── app.py
-├── database.py
-├── uploads/
-│
-├── templates/
-│   └── index.html
-│
-└── static/
-    ├── style.css
-    └── script.js
-
 ## ⚙️ Model Configuration
 
 Change AI model here:
