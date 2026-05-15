@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeReviewer AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="code-theme">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="https://cdn-icons-png.flaticon.com/512/2721/2721620.png" width="28" height="28" alt="logo">
+            <span class="logo-text">CodeReviewer <span class="ai-badge">AI</span></span>
+            <span class="powered">Ollama · llama3.2</span>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn active" onclick="showSection('reviewer', this)">
+                <img src="https://cdn-icons-png.flaticon.com/512/1250/1250615.png" width="16" height="16" alt="review">
+                Reviewer
+            </button>
+            <button class="nav-btn" onclick="showSection('history', this)">
+                <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" width="16" height="16" alt="history">
+                History
+            </button>
+            <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/547/547433.png" width="18" height="18" alt="theme" id="theme-icon">
+            </button>
+        </div>
+    </nav>
+
+    <div id="section-reviewer" class="section active">
+        <div class="top-bar">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1157/1157109.png" width="20" height="20" alt="lines">
+                    <div>
+                        <div class="stat-val" id="line-count">0</div>
+                        <div class="stat-label">Lines</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3143/3143204.png" width="20" height="20" alt="words">
+                    <div>
+                        <div class="stat-val" id="word-count">0</div>
+                        <div class="stat-label">Words</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2821/2821637.png" width="20" height="20" alt="chars">
+                    <div>
+                        <div class="stat-val" id="char-count">0</div>
+                        <div class="stat-label">Chars</div>
+                    </div>
+                </div>
+                <div class="stat-card" id="complexity-card" style="display:none">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1532/1532556.png" width="20" height="20" alt="complexity">
+                    <div>
+                        <div class="stat-val" id="complexity-score">-</div>
+                        <div class="stat-label">Complexity</div>
+                    </div>
+                </div>
+            </div>
+            <div class="lang-row">
+                <select id="language">
+                    <option>Python</option>
+                    <option>JavaScript</option>
+                    <option>TypeScript</option>
+                    <option>Java</option>
+                    <option>C++</option>
+                    <option>C</option>
+                    <option>PHP</option>
+                    <option>SQL</option>
+                    <option>Go</option>
+                    <option>Ruby</option>
+                    <option>C#</option>
+                </select>
+                <button class="btn-clear" onclick="clearAll()">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3687/3687412.png" width="15" height="15" alt="clear">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="panel left-panel">
+                <div class="upload-zone" id="upload-area" onclick="document.getElementById('file-input').click()">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1091/1091515.png" width="32" height="32" alt="upload">
+                    <p>Drop file here or click to upload</p>
+                    <small>Supported: .py .js .java .cpp .php .sql .ts .go .rb .cs</small>
+                    <input type="file" id="file-input" accept=".py,.js,.java,.cpp,.c,.php,.sql,.ts,.go,.rb,.cs" style="display:none" onchange="handleFileUpload(this)">
+                </div>
+                <div id="upload-status"></div>
+                <textarea id="code-input" placeholder="Or paste your code here..." spellcheck="false" oninput="updateStats()"></textarea>
+                <button class="btn-review" onclick="reviewCode()" id="review-btn">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1534/1534996.png" width="18" height="18" alt="review">
+                    Review + Fix
+                </button>
+            </div>
+
+            <div class="panel right-panel">
+                <div class="tab-bar">
+                    <button class="tab active" id="tab-review" onclick="switchTab('review')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1250/1250615.png" width="14" height="14" alt="review">
+                        Review
+                    </button>
+                    <button class="tab" id="tab-fix" onclick="switchTab('fix')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1163/1163497.png" width="14" height="14" alt="fix">
+                        Fixed Code
+                    </button>
+                    <button class="tab" id="tab-diff" onclick="switchTab('diff')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/748/748113.png" width="14" height="14" alt="diff">
+                        Diff
+                    </button>
+                </div>
+
+                <div id="panel-review" class="output-panel active">
+                    <div id="severity-bar" style="display:none" class="severity-bar">
+                        <button class="sev critical" onclick="filterSeverity('critical')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" width="14" height="14" alt="critical">
+                            <span id="sev-critical-count">0</span> Critical
+                        </button>
+                        <button class="sev warning" onclick="filterSeverity('warning')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1680/1680012.png" width="14" height="14" alt="warning">
+                            <span id="sev-warning-count">0</span> Warning
+                        </button>
+                        <button class="sev info" onclick="filterSeverity('info')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/786/786205.png" width="14" height="14" alt="info">
+                            <span id="sev-info-count">0</span> Info
+                        </button>
+                        <button class="sev all active-sev" onclick="filterSeverity('all')">
+                            All
+                        </button>
+                    </div>
+                    <div id="review-output" class="output-content">
+                        <div class="empty-state">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1250/1250615.png" width="48" height="48" alt="empty">
+                            <p>Paste your code and click Review</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-fix" class="output-panel">
+                    <div class="fix-toolbar">
+                        <span id="fix-lang-label" class="lang-pill"></span>
+                        <button class="btn-copy" onclick="copyFix()" id="copy-btn">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1621/1621635.png" width="14" height="14" alt="copy">
+                            Copy
+                        </button>
+                    </div>
+                    <div id="fix-output" class="output-content">
+                        <div class="empty-state">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1163/1163497.png" width="48" height="48" alt="empty">
+                            <p>Fixed code will appear here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-diff" class="output-panel">
+                    <div id="diff-output" class="output-content diff-view">
+                        <div class="empty-state">
+                            <img src="https://cdn-icons-png.flaticon.com/512/748/748113.png" width="48" height="48" alt="diff">
+                            <p>Original vs Fixed diff will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loader" class="loader hidden">
+            <div class="loader-inner">
+                <div class="spinner"></div>
+                <div>
+                    <p>llama3.2 is analyzing your code...</p>
+                    <small>First request may take a moment</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Severity Modal -->
+    <div id="sev-modal" class="modal hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span id="modal-title">Issues</span>
+                <button onclick="closeModal()">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" width="16" height="16" alt="close">
+                </button>
+            </div>
+            <div id="modal-content" class="modal-content"></div>
+        </div>
+    </div>
+
+    <div id="section-history" class="section">
+        <div class="history-container">
+            <div class="history-header">
+                <h2>Review History</h2>
+                <div class="history-controls">
+                    <input type="text" id="history-search" placeholder="Search by filename..." oninput="filterHistory()" class="search-input">
+                    <select id="history-lang-filter" onchange="filterHistory()" class="filter-select">
+                        <option value="">All Languages</option>
+                        <option>Python</option>
+                        <option>JavaScript</option>
+                        <option>TypeScript</option>
+                        <option>Java</option>
+                        <option>C++</option>
+                        <option>PHP</option>
+                        <option>SQL</option>
+                    </select>
+                    <button class="btn-clear" onclick="loadHistory()">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2645/2645890.png" width="15" height="15" alt="refresh">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
