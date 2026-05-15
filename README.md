@@ -39,17 +39,18 @@ It helps developers analyze code, detect issues, and generate improved code sugg
 
 ---
 
-🚀 Setup Guide
-1️⃣ Install Ollama
+## 🚀 DevInspect AI – Setup Guide
+## 1️⃣ ⚙️ Install Ollama
 
-Download from:
-https://ollama.com
+Download Ollama from official site:
 
-2️⃣ Pull AI Model
+👉 https://ollama.com
+
+## 2️⃣ 🤖 Pull AI Model
 ollama pull llama3.2
-3️⃣ Install Dependencies
+## 3️⃣ 📦 Install Dependencies
 pip install flask requests
-4️⃣ Run the Project
+## 4️⃣ ▶️ Run the Project
 
 Open two terminals:
 
@@ -57,9 +58,9 @@ Terminal 1
 ollama serve
 Terminal 2
 python app.py
-5️⃣ Open in Browser
+## 5️⃣ 🌐 Open in Browser
 http://127.0.0.1:5000
-📂 Project Structure
+📁 Project Structure
 devinspect-ai/
 │
 ├── app.py
@@ -72,33 +73,31 @@ devinspect-ai/
 └── static/
     ├── style.css
     └── script.js
-⚙️ Model Configuration
+## ⚙️ Model Configuration
 
-To change the AI model, edit:
+Change AI model here:
 
 MODEL = "llama3.2"
-
-Supported models:
-
+🤖 Supported Models
 llama3.2
 mistral
 codellama
-📌 Future Improvements
+## 📌 Future Improvements
 GitHub integration
 Export review reports
-More language support
+Multi-language support
 VS Code extension
 Better UI animations
-🤝 Contributing
+## 🤝 Contributing
 
-Contributions and suggestions are welcome.
+Contributions are welcome 🚀
+Fork the project and submit a pull request.
 
-Feel free to fork the project and submit pull requests.
-
-📜 License
+## 📜 License
 
 MIT License
 
-💻 About
+## 💻 About
 
-DevInspect AI is a smart AI-assisted code review tool built with Flask and Ollama. It helps developers analyze, debug, and improve code efficiently.
+DevInspect AI is an AI-powered code review tool built using Flask and Ollama.
+It helps developers analyze, debug, and improve code efficiently ⚡
